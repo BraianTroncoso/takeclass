@@ -8,7 +8,6 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLAUDE_DIR="${CLAUDE_HOME:-$HOME/.claude}"
 
 SKILL_DEST="$CLAUDE_DIR/skills/dev-english-practice"
-CMD_DEST="$CLAUDE_DIR/commands/takeclass.md"
 
 unlink_if_ours() {
   local dest="$1" expected_prefix="$2"
@@ -28,5 +27,11 @@ unlink_if_ours() {
 
 echo "Uninstalling takeclass from $CLAUDE_DIR"
 unlink_if_ours "$SKILL_DEST" "$REPO_ROOT"
-unlink_if_ours "$CMD_DEST" "$REPO_ROOT"
+
+shopt -s nullglob
+for cmd_src in "$REPO_ROOT"/commands/*.md; do
+  unlink_if_ours "$CLAUDE_DIR/commands/$(basename "$cmd_src")" "$REPO_ROOT"
+done
+shopt -u nullglob
+
 echo "Done."

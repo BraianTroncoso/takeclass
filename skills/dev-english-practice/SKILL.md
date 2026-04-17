@@ -1,7 +1,7 @@
 ---
 name: dev-english-practice
-description: Generate an English practice session from the developer's daily work (git diff, commits, task context). Produces a reading script, technical vocabulary, rephrasing drills, and self-check questions tailored to the user's level and style. Triggers on /takeclass, or when the user says "let's do my English class", "practice English based on today's work", "prepare a standup in English", "take an English class about what I did today", or similar requests about narrating their dev work in English.
-version: 0.1.0
+description: English practice for developers built around their daily git diff. Three modes — default (read-aloud class with vocabulary, script, rephrase drills, self-check), mirror (user narrates first, Claude polishes with a diff), and recap (rolling 7-day summary). Triggers on /takeclass, /takeclass mirror, /takeclass-recap, or natural-language requests like "practice English on today's work", "correct my English", "how did I do this week".
+version: 0.3.0
 license: MIT
 ---
 
@@ -23,13 +23,27 @@ Do **not** use this skill for:
 - Translating code comments or documentation (that is a separate task, not practice).
 - Writing English PR descriptions to ship (use a writing/review flow, not practice).
 
+## Modes
+
+The skill runs in one of three modes. Decide the mode **before** any other step:
+
+- **default** — the v0.1 class flow (Phases 1–4 below). Picked when `/takeclass` is invoked without the word `mirror`, or when the natural-language ask is about practicing / explaining today's work.
+- **mirror** — the user explains first in their own English, Claude returns a polished version with a diff of what changed and why. Picked when `/takeclass mirror` is invoked, or when the user says "correct my English", "I'll narrate, you polish", "rewrite my explanation", etc. See [Mirror mode flow](#mirror-mode-flow).
+- **recap** — rolling 7-day report of sessions, vocabulary, and weak points. Picked when `/takeclass-recap` is invoked, or when the user asks for "this week's recap", "how did I do this week", "summarize my English practice". See [Recap mode flow](#recap-mode-flow).
+
+When args conflict (e.g. `/takeclass mirror advanced`), mirror mode wins for flow; level/style still shape the polished output.
+
 ## Inputs
 
-- **Optional args from `/takeclass`**: `$1 = level`, `$2 = style`.
-- **Current working directory**: used to gather git activity.
-- **Memory**: prior level, style, weak points, session counter.
+- **Optional args from `/takeclass`**: any of `$1`, `$2`, `$3` may be `beginner|intermediate|advanced` (level), `standup|pr-description|tech-talk|casual-explain` (style), or `mirror` (mode flag). Order is flexible.
+- **`/takeclass-recap`**: takes no args.
+- **Current working directory**: used to gather git activity in default and mirror modes. Ignored in recap mode.
+- **Memory**: prior level, style, weak points, session log, past warm-up vocabulary, past recaps.
 
 ## Phase 1 — Gather today's work
+
+*Applies to **default** and **mirror** modes. Skip in **recap** mode.*
+
 
 Run these commands from the current working directory (do not cd elsewhere):
 
@@ -53,11 +67,14 @@ Ask the user: *"I can't see git activity for today in this directory. Tell me in
 
 ## Phase 2 — Load preferences from memory
 
+*Applies to **default** and **mirror** modes. Recap mode reads memory separately (see its flow).*
+
 Check the memory system at `~/.claude/projects/<project-slug>/memory/` for these files:
 
 - `english_preferences.md` — level + style.
 - `english_weak_points.md` — recurring grammar/vocabulary issues the user has flagged.
-- `english_session_log.md` — session counter and last-run date.
+- `english_session_log.md` — session dates (list), total counter, last-run date, mirror-attempts counter.
+- `english_warm_up_history.md` *(optional)* — deduplicated list of warm-up terms from past sessions, used by recap.
 
 If `english_preferences.md` is missing **and** the user did not pass args:
 
@@ -83,6 +100,8 @@ type: user
 If args were passed (`/takeclass advanced tech-talk`), use them and skip the questions. Still save/update memory with the new values.
 
 ## Phase 3 — Generate the practice output
+
+*Applies to **default** mode only. If mode is `mirror`, jump to [Mirror mode flow](#mirror-mode-flow). If mode is `recap`, jump to [Recap mode flow](#recap-mode-flow).*
 
 Produce a single Markdown block with exactly these four sections, in order:
 
@@ -138,10 +157,15 @@ Tailor at least one question to something specific from today's diff.
 
 ## Phase 4 — Update memory
 
+*Applies to **default** and **mirror** modes. Recap mode is read-only of memory (only writes its own snapshot).*
+
 After producing the output:
 
 - If during the session the user asked "how do I say X?" or you detected a recurring issue (e.g., always confusing "make" vs "do"), append it to `english_weak_points.md` (type: `feedback`). Include the example and a one-line rule.
-- Update `english_session_log.md` (type: `project`): increment counter, set last-run date to today's `currentDate` from context.
+- **Append today's date** to the `sessions:` list in `english_session_log.md` (type: `project`). If today is already listed, do **not** duplicate it.
+- Increment `sessions_total` (create at 1 if file doesn't exist). Set `last_run` to today's `currentDate`.
+- In mirror mode, also increment `mirror_attempts_week` (reset to 0 when the ISO week changes).
+- Append the session's warm-up terms (default mode only) to `english_warm_up_history.md` as a dated block, so recap can aggregate them.
 - Do **not** silently save weak points — mention to the user what you logged so they can correct you.
 
 On subsequent sessions:
@@ -149,11 +173,28 @@ On subsequent sessions:
 - Reference past weak points in the rephrase drill or warm-up (e.g., if "whereas" was flagged, include it in a drill sentence).
 - Every 5 sessions, bump difficulty a notch within the chosen level (more complex sentence structures, richer vocab).
 
-## Output format
+### Streak computation and display
 
-Wrap the entire class in a single fenced output so the user can scroll it as one block. Begin with a one-line header:
+Before emitting the final output (in default or mirror mode), compute the streak:
+
+1. Read the `sessions:` list from `english_session_log.md` (or treat as empty if the file doesn't exist yet).
+2. Append today's date to the list **in memory** (the persisted write happens in Phase 4 above; here we just reason about the final state).
+3. Sort unique dates descending. Count consecutive calendar days ending at today's `currentDate`. That count is the **streak**.
+4. No freeze tokens, no grace days. A missed calendar day resets streak to 1 (today's session).
+
+Display rules:
+
+- If streak ≥ 2 → prepend the output with: `🔥 Streak: {N} days — don't break it.`
+- If streak == 1 **and** `sessions_total` > 1 → prepend: `🌱 Back after a break. Today counts as day 1.`
+- If `sessions_total` == 1 (first ever session) → prepend: `🌱 First class. Welcome.`
+
+## Output format (default mode)
+
+Wrap the entire class in a single fenced output so the user can scroll it as one block. Order:
 
 ```
+{streak banner}
+
 📚 English class — session #{N} — {level} / {style} — {date}
 ```
 
@@ -162,6 +203,103 @@ Then the four sections. End with:
 ```
 💡 When you finish reading aloud, tell me which words tripped you up — I'll log them for next time.
 ```
+
+## Mirror mode flow
+
+When mode is `mirror`, replace Phases 3 and "Output format" with this flow. Phases 1 (gather git), 2 (load preferences) and 4 (update memory, including streak) still run.
+
+### Steps
+
+1. **Reuse context** from Phase 1 (git diff, commits, or fallback summary).
+2. **Prompt the user**:
+   > *"In your own words, narrate what you did today — don't worry about being correct. Paste 100–400 words of English when ready."*
+3. **Receive the paste.** If the paste is < ~30 words, ask them to expand ("give me a bit more to work with — aim for a full paragraph"). If > ~800 words, ask them to narrow to one topic.
+4. **Strip secrets** from the paste (tokens, `.env` values, anything matching common secret patterns) before any processing or memory write.
+5. **Produce output** — a single Markdown block with:
+
+```
+{streak banner}
+
+🪞 Mirror — session #{N} — {level} ceiling — {date}
+
+### What changed
+- "original fragment" → "fix" — one-line reason.
+- ... (3–6 bullets, ordered by impact — highest-value corrections first)
+
+### Polished version
+{the user's paragraph, rewritten in better English, same register, same voice, respecting their current level as a ceiling — a light stretch upward is fine, a dramatic jump is not}
+
+### 📌 Pattern to watch
+{the single most important recurring issue across the paste}
+Examples from your paste:
+- "quoted fragment"
+- "quoted fragment"
+
+🔁 Want to narrate again with these fixes in mind? Paste the new version and I'll check it.
+```
+
+### Mirror-specific rules
+
+- **Order matters**: `What changed` goes before `Polished version`. The user should process corrections before seeing the clean form.
+- **Preserve voice.** If the user writes casual, the polished version stays casual. Do not over-formalize.
+- **Level as ceiling.** If the user's level is `beginner`, don't rewrite into `advanced` prose — keep it accessible.
+- **One pattern only.** Even if there are many issues, elevate only the most impactful one to `Pattern to watch`. The others live in the bullets.
+- **Do not** emit the default mode's warm-up, script, rephrase, or self-check sections — mirror is its own shape.
+- **Memory**: append the pattern callout to `english_weak_points.md` (feedback type). Increment `mirror_attempts_week` in the session log.
+
+## Recap mode flow
+
+When mode is `recap` (triggered by `/takeclass-recap` or equivalent natural language), run this flow. Takes no args. Skip Phases 1, 2, 3, 4 above — recap has its own read/write cycle below.
+
+### Steps
+
+1. **Read memory:**
+   - `english_session_log.md` → list of session dates; derive which of the last 7 calendar days had a session.
+   - `english_weak_points.md` → all recorded weak points.
+   - `english_warm_up_history.md` → warm-up terms from the last 7 days.
+2. **Compute:**
+   - Day grid: today going back 6 days. Mark each `✅` if a session occurred that day, `⬜` otherwise.
+   - Streak (consecutive calendar days ending today with a session).
+   - Top 3 weak points by recurrence count across recorded entries.
+   - Deduplicated vocabulary list from the week (cap at 15 entries).
+3. **Produce output** — single Markdown block:
+
+```
+📅 Weekly recap — rolling 7 days — {start_date} → {today}
+🔥 Streak: {N} days
+
+### Sessions this week
+{N} of 7 days
+{Mon ✅  Tue ⬜  Wed ✅  Thu ✅  Fri ⬜  Sat ⬜  Sun ✅}
+
+### Vocabulary learned
+- term1 — short gloss
+- term2 — short gloss
+... (10–15 entries; if history is thin, say "not enough history yet — keep showing up")
+
+### Top 3 weak points
+1. {rule} — example from your own paste/session.
+2. {rule} — example.
+3. {rule} — example.
+
+### Sentence you probably still can't say cleanly
+Pick one example from weak point #1 and drill it in 3 registers:
+- Formal: "..."
+- Casual: "..."
+- Hedged: "..."
+
+### Next week's focus
+{one concrete, specific goal drawn from weak point #1. Example: "Get 'thorough' and 'through' to feel distinct in your mouth — read each out loud 10 times before next class."}
+```
+
+4. **Snapshot to memory:** write the full recap to `english_recap_{YYYY}-W{WW}.md` (ISO week) under the project's `memory/` dir. Add a pointer in `MEMORY.md`. These snapshots are immutable — future runs only read/append, never overwrite.
+5. **Do not** mutate `english_session_log.md` or `english_weak_points.md` in recap mode. Recap is a read-only view of state (except for its own snapshot file).
+
+### Recap-specific rules
+
+- **No AskUserQuestion.** Recap is a pure report.
+- **Empty memory** (no sessions yet): print a single-line message — *"No recap yet. Take your first class with `/takeclass`."* Don't fabricate.
+- **Week boundary**: rolling 7-day window ending today. Not ISO Mon–Sun. The snapshot filename uses ISO week only for uniqueness/filing, not as the window definition.
 
 ## Examples
 
