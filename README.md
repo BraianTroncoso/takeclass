@@ -142,12 +142,14 @@ them for next time.
 
 ## Roadmap
 
-See [ROADMAP.md](./ROADMAP.md) for what's next:
+See [ROADMAP.md](./ROADMAP.md) for the detailed specs. In short:
 
-- **v0.2** — voice loop. Read the script aloud, Claude hears you, flags pronunciation and filler words. Bring your own STT (OS dictation, Whisper, etc.).
-- **v0.3** — MCP server. Decouple the logic so any MCP client can host the class, not just Claude Code.
-- **v0.4** — progression engine. Spaced-repetition for weak words, automatic difficulty curve, weekly recap.
-- **v0.5+** — interview-practice mode, team mode, Linear/Jira integration, more target registers.
+- **v0.2 — Mirror mode.** Invert the flow: you narrate first, Claude returns a polished version with a diff of what changed and why. Active learning, not passive reading.
+- **v0.3 — Streak + weekly recap.** Daily streak counter on every class, plus a separate `/takeclass-recap` command that summarizes the week — sessions, vocabulary learned, top weak points, next week's focus.
+- **v0.4 — Voice loop.** Read the script aloud, Claude hears you, flags pronunciation and filler words. Bring your own STT (OS dictation, Whisper, etc.).
+- **v0.5 — MCP server.** Decouple the logic so any MCP client can host the class, not just Claude Code.
+- **v0.6 — Progression engine.** Spaced-repetition for weak words, automatic difficulty curve, vocabulary deck.
+- **v0.7+** — interview-practice mode, team mode, Linear/Jira integration, persona mode.
 
 ---
 
