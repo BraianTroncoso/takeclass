@@ -1,9 +1,25 @@
-# takeclass
+<p align="center">
+  <img src="docs/hero.png" alt="takeclass" width="100%">
+</p>
 
-> Turn your day's git diff into an English practice session.
-> For devs who can ship the feature but choke when they have to explain it in English.
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-E8A05C?style=flat-square" alt="MIT">
+  <img src="https://img.shields.io/badge/Claude%20Code-skill-E8A05C?style=flat-square" alt="Claude Code skill">
+  <img src="https://img.shields.io/badge/your%20data-never%20leaves%20your%20machine-3a3a44?style=flat-square" alt="local only">
+</p>
 
-`takeclass` is a [Claude Code](https://claude.com/claude-code) skill + slash command. Run `/takeclass` in a repo where you worked today, and Claude turns your actual changes into a spoken-English workout built around your own code.
+<p align="center">
+  <b>For devs who can ship the feature but choke when they have to explain it in English.</b><br>
+  Run <code>/takeclass</code> in a repo where you worked today. Claude turns your actual diff into a spoken-English workout.
+</p>
+
+<p align="center">
+  <a href="#install"><b>Install</b></a> ·
+  <a href="#chunking--the-script-marked-up-for-your-mouth"><b>Chunking</b></a> ·
+  <a href="#usage"><b>Usage</b></a> ·
+  <a href="#a-real-example"><b>Example</b></a> ·
+  <a href="./ROADMAP.md"><b>Roadmap</b></a>
+</p>
 
 ---
 
@@ -47,11 +63,9 @@ You pause wherever you run out of air, which lands mid-phrase. You stress every 
 
 A plain paragraph tells you nothing about any of that. So the script can come like this instead:
 
-<pre>
-🟦 `YESterday I spent` 🟩 `the WHOLE day` 🟦 `on the HEro` 🟩 `of our LANDing page.` ▸
-
-🟦 `The HEADline is built` 🟩 `out of TIny leaves` 🟧 `come together` 🟩 `into‿a WORD.`
-</pre>
+<p align="center">
+  <img src="docs/cli.png" alt="chunked output in the terminal" width="100%">
+</p>
 
 Five marks, and not one of them is grammar:
 
@@ -65,6 +79,11 @@ Five marks, and not one of them is grammar:
 
 And one rule that matters more than all five: **if you trip, repeat the group, not the sentence.** A group is three words. Restarting the sentence is what turns a stumble into a spiral.
 
+<p align="center">
+  <img src="docs/flork-card.png" alt="you got this" width="300">
+  <br><em>You'll get it. It took me a podcast nobody will ever hear.</em>
+</p>
+
 ### Three formats
 
 | Command | What you get |
@@ -72,6 +91,11 @@ And one rule that matters more than all five: **if you trip, repeat the group, n
 | `/takeclass chunked` | Inline, in the terminal. Nothing to install. |
 | `/takeclass chunked-html` | Full color, opens in your browser, scrolls while you record. |
 | `/takeclass chunked-pdf` | Printable, for a music stand or a tablet. Needs `weasyprint`. |
+
+<p align="center">
+  <img src="docs/html.png" alt="the same script in the html and pdf formats" width="100%">
+  <br><em>The same three lines in <code>html</code>. Same system, real color, and stress goes back to bold because a browser can render it mid-word.</em>
+</p>
 
 HTML and PDF add two things the terminal can't fit: a table of every fixed block in the script, and a 90-second drill to run before you read.
 
@@ -205,7 +229,7 @@ And the same script with `chunked` turned on:
 
 🟦 `The GOAL was` 🟧 `to support` 🟩 `reFRESH tokens` 🟦 `without BREAKing` 🟩 `exISTing flows.` ▸
 
-🟦 `Along the WAY` 🟧 `I caught` 🟩 `an EDGE case:` ▸ 🟦 `the token was vaLID` 🟩 `but exPIRED` 🟧 `by less than a second.`
+🟦 `Along the WAY` 🟧 `I caught` 🟩 `an EDGE case` ▸ 🟦 `the token was vaLID` 🟩 `but exPIRED` 🟧 `by less than a second.`
 </pre>
 
 Same words. The difference is that now you know where to breathe.
