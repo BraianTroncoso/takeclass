@@ -109,8 +109,22 @@ document is self-contained and survives being moved or emailed). Markup:
 `g1` and `g2` alternate strictly. `gf` is a fixed block and breaks the alternation
 without resetting it.
 
-Write to a temp path, then open it: `wslview`, `xdg-open`, or `open`, whichever
-exists. If none do, print the path and let the user open it.
+Write to a temp path, then open it. Try in this order, first hit wins:
+
+| Environment | Command |
+|---|---|
+| WSL | `explorer.exe "$(wslpath -w <file>)"` |
+| Linux | `wslview <file>` if present, else `xdg-open <file>` |
+| macOS | `open <file>` |
+
+**WSL is a trap worth spelling out.** `xdg-open` is usually installed there and
+usually does nothing useful — it resolves to a Linux handler that has no browser
+behind it, so the command exits 0 and no window appears. Detect WSL first
+(`grep -qi microsoft /proc/version`) and take the `explorer.exe` branch, which needs
+`wslpath -w` because Windows cannot read a `/tmp/...` path.
+
+If nothing opens, print the absolute path and let the user click it. Never report a
+file as opened without having verified the command exists.
 
 ## Format 3 — `pdf`
 

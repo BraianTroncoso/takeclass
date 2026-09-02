@@ -249,8 +249,10 @@ Never attempt to install it, and never let its absence block the class.
 
 For `html` and `pdf`, write the file under the system temp dir (or a path the user
 names), inline `assets/chunking.css` inside a `<style>` tag so the file is
-self-contained, and open it with whichever of `wslview` / `xdg-open` / `open` exists.
-If none exist, print the absolute path.
+self-contained, and open it. Opener order is in
+[references/chunking.md](references/chunking.md#format-2--html) — note the WSL case,
+where `xdg-open` exits cleanly and opens nothing, and `explorer.exe` with `wslpath -w`
+is what actually works. If no opener exists, print the absolute path.
 
 ### What gets chunked
 
