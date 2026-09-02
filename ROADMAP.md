@@ -137,7 +137,7 @@ and restarts the sentence — the exact failure chunking exists to prevent.
 
 | Arg | Format | Dependency |
 |---|---|---|
-| `chunked` | inline markdown (`│`, backticks, bold) | none |
+| `chunked` | inline markdown (`│`, backticks, UPPERCASE stress) | none |
 | `chunked-html` | full color, opens in browser | none |
 | `chunked-pdf` | printable | `weasyprint` |
 
@@ -202,14 +202,14 @@ groups. Also tested. What actually comes back:
 - `+` renders green text, `-` renders red text. **Text color, not background.**
 - `!` renders the same green as `+`. `@@` renders plain. There is **no third color**,
   so fixed blocks have nothing to be colored with.
-- Worse, markdown does not render inside a fenced block. Bold and inline code both
-  die there — which means the two marks that already carry color and weight in the
-  plain-markdown version get downgraded to ALL CAPS and [brackets].
+- Markdown does not render inside a fenced block, so inline code dies there and fixed
+  blocks lose the distinct color they get for free outside it.
 
-Net: the diff block buys one signal (alternating groups in real color) and sells two
-(stress, fixed blocks). The plain-markdown version wins 2 of 3, since inline code
-already renders in a distinct color on its own. Red also reads as *error*, when here
-it would only mean *next group*.
+Net: the diff block buys one signal (alternating groups in real color) and sells one
+(fixed blocks, which inline code already colors on its own). Stress is uppercase in
+either case — see the bold rule in `references/chunking.md` — so it is not a
+differentiator. Red also reads as *error*, when here it would only mean *next group*.
+Not worth the trade.
 
 Both experiments point the same way: inline output should lean on what the markdown
 renderer already colors, not on trying to drive the terminal directly.

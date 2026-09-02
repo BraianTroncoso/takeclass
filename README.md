@@ -42,15 +42,15 @@ Your level, style, and recurring weak points are remembered across sessions. Eve
 A plain paragraph tells you nothing about *how* to say it. So at the end of each class, `takeclass` offers you the same script with reading marks on it:
 
 ```
-I **asked** my agent │ if its own **work** │ was any **good**. ▸
+YESterday I spent │ the WHOLE day │ on the HEro │ of our LANDing page. ▸
 
-And a **mod**el │ `goes along with` │ whatever it just **said**.
+The HEADline is built │ out of TIny leaves │ that `come together` │ into‿a WORD.
 ```
 
 Four signals, and none of them are grammar:
 
 - `│` separates **breath groups** — say each one without stopping inside it. Where you pause is most of what makes English sound fluent or broken.
-- **Bold** is the **stressed syllable**, exactly one per group. Even stress is the loudest tell of a Spanish, Italian or Portuguese speaker — louder than any conjugation error.
+- **UPPERCASE** marks the **stressed syllable**, exactly one per group. Even stress is the loudest tell of a Spanish, Italian or Portuguese speaker — louder than any conjugation error. (Caps rather than bold because stress lands on a syllable, and `**Yes**terday` is not something a terminal renders.)
 - `` `backticks` `` are **fixed blocks**: phrasal verbs and collocations that behave like a single word. `pick up` said with a gap in the middle stops sounding like English even when every phoneme is right.
 - `▸` is the only place you're allowed to breathe. `‿` means the consonant binds to the next vowel — `pick‿up` is *"pi-kap"*.
 

@@ -67,22 +67,39 @@ that renders correctly in every terminal:
 |---|---|
 | Breath group boundary | ` │ ` (U+2502, spaces on both sides) |
 | Fixed block | `` `backticks` `` |
-| Stress | `**bold**` |
+| Stress | **UPPERCASE on the stressed syllable** |
 | Linking | `‿` unchanged |
 | Pause | `▸` unchanged |
 
 One anchor per line. Blank line between anchors.
 
 ```
-I **asked** my agent │ if its own **work** │ was any **good**. ▸
+YESterday I spent │ the WHOLE day │ on the HEro │ of our LANDing page. ▸
 
-And a **mod**el │ `goes along with` │ whatever it just **said**.
+The HEADline is built │ out of TIny leaves │ that `come together` │ into‿a WORD.
 
-I would `take it at face value` ▸ but a**noth**er agent │ `tries to tear it‿apart`.
+I would `take it at face value` ▸ but aNOTHer agent │ `tries to tear it‿apart`.
 ```
 
-Do not put `**bold**` inside backticks — inline code does not render nested
-formatting. A fixed block carries its own emphasis; it does not need bold too.
+### Never use `**bold**` for stress in `cli`
+
+This is the one rule in this file that was learned by shipping it broken.
+
+Stress lands on a **syllable**, not a word, so bold produces `**Yes**terday`,
+`**head**line`, `**he**ro`. Intra-word emphasis is not supported by terminal
+markdown renderers, and worse, an unclosed `**` desyncs the parser for the **rest of
+the line** — so a correctly formed `**whole**` later in the same line also renders as
+literal asterisks. The output becomes unreadable exactly where it should be clearest.
+
+Uppercase has none of those failure modes, is what pronunciation dictionaries already
+use, and survives any renderer. It also degrades gracefully: copy-pasted into a plain
+text file it still reads correctly, which bold does not.
+
+This applies to `cli` only. In `html`/`pdf`, `<b>Yes</b>terday` is valid markup and
+renders exactly right — keep bold there.
+
+Also: do not put emphasis of any kind inside backticks. Inline code renders no nested
+formatting, and a fixed block already carries its own weight and color.
 
 ## Format 2 — `html`
 
