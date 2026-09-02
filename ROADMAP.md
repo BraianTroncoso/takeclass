@@ -193,6 +193,27 @@ escapes through. Do not treat it as confirmation.
 So the markdown marks in `cli` are not a fallback, they are the design. Do not
 re-litigate this without re-testing on the specific host.
 
+### Settled: a ```diff block is not the way either
+
+The follow-up idea, once you notice the host does paint colors somewhere: wrap the
+script in a fenced ```diff block and let syntax highlighting alternate the breath
+groups. Also tested. What actually comes back:
+
+- `+` renders green text, `-` renders red text. **Text color, not background.**
+- `!` renders the same green as `+`. `@@` renders plain. There is **no third color**,
+  so fixed blocks have nothing to be colored with.
+- Worse, markdown does not render inside a fenced block. Bold and inline code both
+  die there — which means the two marks that already carry color and weight in the
+  plain-markdown version get downgraded to ALL CAPS and [brackets].
+
+Net: the diff block buys one signal (alternating groups in real color) and sells two
+(stress, fixed blocks). The plain-markdown version wins 2 of 3, since inline code
+already renders in a distinct color on its own. Red also reads as *error*, when here
+it would only mean *next group*.
+
+Both experiments point the same way: inline output should lean on what the markdown
+renderer already colors, not on trying to drive the terminal directly.
+
 ### Open questions
 
 - Is one anchor per line right for `cli`, or should short anchors share a line?
