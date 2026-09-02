@@ -279,20 +279,3 @@ MIT — see [LICENSE](./LICENSE).
 
 ---
 
-## More work by the same author
-
-Selected projects from [@BraianTroncoso](https://github.com/BraianTroncoso):
-
-- **Frontdeck** *(private)* — Design system platform that generates premium websites where every site has its own visual identity, narrative structure, and component architecture, from a single codebase. 474+ Vue components, 22 themes, 39 block types, 200+ variants, AI-native design pipeline. Not a template. A design engine. *(Laravel 12 + Vue 3 + Filament + Inertia + GSAP + Three.js + Tailwind 4)*
-
-- **LevelUp** *(private)* — Stoic habit tracker PWA with 23 curated daily habits, an honest self-evaluation flow (*"did you actually do the work before feeling bad?"*), and a live chat with Marcus Aurelius, Seneca, and Epictetus powered by Llama 3.3. XP system, streaks, Memento Mori tracker, shareable progress cards. Trilingual (ES/EN/PT), fully offline-capable. *(Next.js 16 + Framer Motion + Groq AI + PWA)*
-
-- **[myjarbis](https://github.com/BraianTroncoso/myjarbis)** — AI Dev Assistant with persistent memory for Claude Code.
-
-- **GesturePilot** — Control Claude Code with hand gestures.
-
-- **GymSphere** *(private)* — Gym management platform.
-
-- **SecondBraian** *(private)* — My second brain. Personal knowledge vault powered by Obsidian. PARA method, Maps of Content, 10 custom templates. Where thoughts become connections and chaos becomes clarity.
-
-- **GAME-JAM-FAD-CUYO-2022** — A complete game built in under 12 hours at a game jam. Ship or die.
