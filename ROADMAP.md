@@ -177,12 +177,24 @@ for U+203F (`‿`). DejaVu does. Renderers fall back per character, so prose get
 and the tie marks get DejaVu. Remove DejaVu from the stack and every linking mark
 turns into a box — silently, since nothing errors.
 
+### Settled: ANSI is not an option for `cli`
+
+The obvious idea is to emit real ANSI background colors inline and reproduce the
+three-color system exactly. **Tested and it does not work.** Escape sequences
+written into an assistant message do not survive the host's markdown renderer —
+they reach the terminal as literal `[46;30m` text, so the reader gets bracket
+noise instead of color.
+
+Note the trap: a user will report "I see colors in my CLI all the time", and they
+do — bold, inline code, headings are all colored by the renderer. That is the
+renderer coloring *its own* markdown, which is a different thing from passing raw
+escapes through. Do not treat it as confirmation.
+
+So the markdown marks in `cli` are not a fallback, they are the design. Do not
+re-litigate this without re-testing on the specific host.
+
 ### Open questions
 
-- Should `cli` attempt real ANSI background colors instead of markdown marks? It
-  would reproduce the three-color system exactly, but whether raw escape sequences
-  survive the host's markdown renderer is host-specific and unverified. Markdown
-  marks work everywhere; treat ANSI as an experiment to confirm before shipping.
 - Is one anchor per line right for `cli`, or should short anchors share a line?
   Currently one per line, matching how the HTML reads.
 
