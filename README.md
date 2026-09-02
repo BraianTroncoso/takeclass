@@ -68,7 +68,7 @@ Three formats:
 
 The HTML and PDF versions add a table of every fixed block in the script — with a rough respelling in your own language instead of IPA, because *"pi-kap"* is readable on sight and /pɪk ʌp/ needs a lookup — plus a 90-second warm-up drill.
 
-Pick the same format twice and it stops asking.
+**You're asked once.** The first run picks your chunking format alongside your level and style, and then never asks again. The default is `none` — a plain class — because chunking is for the days you actually intend to read out loud, and marks on a script you're only skimming are noise. Change it whenever by saying so: *"switch chunking to html"*. The `chunked*` args above are one-offs and don't touch the saved setting.
 
 ---
 

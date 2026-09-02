@@ -35,7 +35,7 @@ When args conflict (e.g. `/takeclass mirror advanced`), mirror mode wins for flo
 
 ## Inputs
 
-- **Optional args from `/takeclass`**: any of `$1`, `$2`, `$3` may be `beginner|intermediate|advanced` (level), `standup|pr-description|tech-talk|casual-explain` (style), `mirror` (mode flag), or `chunked|chunked-html|chunked-pdf` (chunking flag — see [Phase 5](#phase-5--offer-the-chunked-version)). Order is flexible.
+- **Optional args from `/takeclass`**: any of `$1`, `$2`, `$3` may be `beginner|intermediate|advanced` (level), `standup|pr-description|tech-talk|casual-explain` (style), `mirror` (mode flag), or `chunked|chunked-html|chunked-pdf` (chunking flag — see [Phase 5](#phase-5--apply-the-chunking-preference)). Order is flexible.
 - **`/takeclass-recap`**: takes no args.
 - **Current working directory**: used to gather git activity in default and mirror modes. Ignored in recap mode.
 - **Memory**: prior level, style, weak points, session log, past warm-up vocabulary, past recaps.
@@ -78,10 +78,18 @@ Check the memory system at `~/.claude/projects/<project-slug>/memory/` for these
 
 If `english_preferences.md` is missing **and** the user did not pass args:
 
-Use `AskUserQuestion` with two questions:
+Use `AskUserQuestion` with three questions:
 
 1. **Level** — beginner / intermediate / advanced.
 2. **Style** — standup / pr-description / tech-talk / casual-explain.
+3. **Chunking** — none / cli / html / pdf. Offer `none` first and label it as the
+   default. Describe the others in one line each: `cli` marks the script inline with
+   colored squares, `html` opens the full-color version in a browser, `pdf` renders a
+   printable one. Drop `pdf` from the options if `weasyprint` is absent.
+
+Asking once, up front, alongside the other two settings, is the whole point — the
+user decides how they want to read before they have a class to read, and never sees
+the question again.
 
 Save both to `english_preferences.md` (type: `user`) and add a pointer to `MEMORY.md`. Format:
 
@@ -94,12 +102,16 @@ type: user
 
 - Level: intermediate
 - Style: standup
-- Chunking: cli
+- Chunking: none
 - Last updated: 2026-04-17
 ```
 
-`Chunking` is optional and only appears once the user has settled on a format
-(see [Phase 5](#phase-5--offer-the-chunked-version)). Absent means "keep asking".
+`Chunking` is one of `none` / `cli` / `html` / `pdf` and **defaults to `none`**. A
+plain class is the product; chunking is for the sessions where the user intends to
+read out loud, and forcing marks on someone who just wants to skim is noise.
+
+A file written before v0.4 will not have the line. Treat a missing `Chunking` as
+"never asked" — see [Phase 5](#phase-5--apply-the-chunking-preference).
 
 If args were passed (`/takeclass advanced tech-talk`), use them and skip the questions. Still save/update memory with the new values.
 
@@ -208,44 +220,49 @@ Then the four sections. End with:
 💡 When you finish reading aloud, tell me which words tripped you up — I'll log them for next time.
 ```
 
-## Phase 5 — Offer the chunked version
+## Phase 5 — Apply the chunking preference
 
 *Applies to **default** mode only. Skip in mirror and recap modes.*
 
 A plain paragraph tells the reader nothing about where to breathe, what to stress, or
-which words never come apart. Chunking marks all three on the page. Read
+which words never come apart. Chunking marks all three. Read
 [references/chunking.md](references/chunking.md) before producing any chunked output —
 it defines the five marks, the sizing rules, and the three formats.
 
-### When to offer it
+### Resolving the format
 
-After emitting the class, add one line:
+Check these in order and stop at the first hit:
 
-```
-📄 Want this script with chunking marks — breath groups, stress, phrasal-verb blocks? (cli / html / pdf / no)
-```
+1. **An arg was passed** — `chunked` → `cli`, `chunked-html` → `html`, `chunked-pdf` →
+   `pdf`. A one-off arg does **not** overwrite the saved preference.
+2. **`Chunking:` exists in `english_preferences.md`** — use it. If it is `none`, emit
+   a plain class and say nothing about chunking.
+3. **The line is missing** (a file written before v0.4) — ask once, as a single line
+   at the end of the class, then save the answer:
 
-Do **not** use `AskUserQuestion` here. It is a one-line aside at the end of a long
-output, not a decision that should interrupt the flow with a modal.
+   ```
+   📄 One-time setup: want the read-aloud script marked up for practice? (none / cli / html / pdf)
+   ```
 
-Skip the question entirely when:
+Never ask twice. New users answer this in Phase 2 alongside level and style and never
+see it again; the one-line question exists only to migrate users who predate the
+setting.
 
-- The user passed `chunked`, `chunked-html` or `chunked-pdf` as an arg → produce that
-  format immediately, no question.
-- Memory records a standing preference (see below) → honor it silently, and mention in
-  one short line which format you used and that they can change it any time.
+To change it later the user just says so ("switch chunking to html") — update the file
+and confirm in one line.
 
 ### Formats
 
-| Arg | Format | Needs |
+| Preference | Output | Needs |
 |---|---|---|
-| `chunked` | `cli` — inline, markdown marks | nothing |
-| `chunked-html` | `html` — full color, opens in browser | nothing |
-| `chunked-pdf` | `pdf` — printable | `weasyprint` |
+| `none` *(default)* | plain class, no marks | nothing |
+| `cli` | inline, colored squares | nothing |
+| `html` | full color, opens in a browser | nothing |
+| `pdf` | printable | `weasyprint` |
 
-Before offering `pdf`, check `command -v weasyprint`. If it is absent, drop `pdf` from
-the offered choices and add one line: *"`pip install weasyprint` unlocks a PDF version."*
-Never attempt to install it, and never let its absence block the class.
+Check `command -v weasyprint` before offering or honoring `pdf`. If it is absent, fall
+back to `html`, say so in one line, and mention that `pip install weasyprint` unlocks
+the PDF. Never attempt to install it, and never let its absence block a class.
 
 For `html` and `pdf`, write the file under the system temp dir (or a path the user
 names), inline `assets/chunking.css` inside a `<style>` tag so the file is
@@ -262,13 +279,6 @@ questions stay plain — they are reference, not performance.
 `html` and `pdf` carry the whole class so the file stands alone, and add two things
 `cli` omits: the fixed-block table (block / sounds like / what it is) and the
 90-second drill. Inline, those push the script off screen.
-
-### Memory
-
-If the user picks the same format **twice in a row**, save it to
-`english_preferences.md` as `Chunking: {format}` and stop asking. Tell them once that
-you have done so and that they can change it any time. If they ever answer `no`, drop
-the standing preference and go back to asking.
 
 ## Mirror mode flow
 
