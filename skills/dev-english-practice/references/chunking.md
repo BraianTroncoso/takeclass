@@ -65,25 +65,32 @@ that renders correctly in every terminal:
 
 | Mark | Rendered as |
 |---|---|
-| Breath group | 🟦 / 🟩 prefix, strictly alternating |
-| Fixed block | 🟧 prefix |
+| Breath group | 🟦 / 🟩 prefix, strictly alternating, text in backticks |
+| Fixed block | 🟧 prefix, text in backticks |
 | Stress | UPPERCASE on the stressed syllable |
 | Linking | `‿` unchanged |
-| Pause | `▸` unchanged |
+| Pause | `▸` unchanged, outside the backticks |
+
+Every group is wrapped in backticks — that is what puts the text itself in color and
+gives it a tinted background, so a group reads as a block instead of as a run of
+words. The square in front is what says *which kind* of block it is.
 
 One anchor per line. Blank line between anchors.
 
-```
-🟦 YESterday I spent 🟩 the WHOLE day 🟦 on the HEro 🟩 of our LANDing page. ▸
+<pre>
+🟦 `YESterday I spent` 🟩 `the WHOLE day` 🟦 `on the HEro` 🟩 `of our LANDing page.` ▸
 
-🟦 The HEADline is built 🟩 out of TIny leaves 🟧 come together 🟩 into‿a WORD.
+🟦 `The HEADline is built` 🟩 `out of TIny leaves` 🟧 `come together` 🟩 `into‿a WORD.`
 
-🟦 I would 🟧 take it at face value 🟦 but aNOTHer agent 🟧 tries to tear it‿apart.
-```
+🟦 `I would` 🟧 `take it at face value` 🟦 `but aNOTHer agent` 🟧 `tries to tear it‿apart.`
+</pre>
 
 The squares carry the same color code as the HTML and PDF versions — blue and green
 alternate for breath groups and mean nothing individually, orange marks a fixed
 block. A reader who has seen the PDF reads this without being taught twice.
+
+Punctuation goes inside the backticks; `▸` goes outside, since a pause belongs between
+groups rather than to either one.
 
 ### Why colored squares and not real color
 
@@ -99,9 +106,11 @@ Real terminal color is not available here and this is not worth re-testing:
   background, offers only two usable colors and no third for fixed blocks, and kills
   markdown inside the fence.
 
-Do not put fixed blocks in backticks *and* mark them with 🟧. The renderer tints
-inline code, and that tint fights the orange square instead of reinforcing it. Pick
-the square.
+The backticks do the rest. The renderer tints inline code, which is the only way to
+get colored text and a background inline, so **every** group gets them — not just the
+fixed blocks. If only some groups were wrapped, the tint would read as a distinction
+that does not exist, and it would compete with the squares instead of supporting them.
+Uniform backticks, squares carry the meaning.
 
 ### Never use `**bold**` for stress in `cli`
 
