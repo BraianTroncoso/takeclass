@@ -37,6 +37,39 @@ Your level, style, and recurring weak points are remembered across sessions. Eve
 
 ---
 
+## Chunking — the script, marked up for your mouth
+
+A plain paragraph tells you nothing about *how* to say it. So at the end of each class, `takeclass` offers you the same script with reading marks on it:
+
+```
+I **asked** my agent │ if its own **work** │ was any **good**. ▸
+
+And a **mod**el │ `goes along with` │ whatever it just **said**.
+```
+
+Four signals, and none of them are grammar:
+
+- `│` separates **breath groups** — say each one without stopping inside it. Where you pause is most of what makes English sound fluent or broken.
+- **Bold** is the **stressed syllable**, exactly one per group. Even stress is the loudest tell of a Spanish, Italian or Portuguese speaker — louder than any conjugation error.
+- `` `backticks` `` are **fixed blocks**: phrasal verbs and collocations that behave like a single word. `pick up` said with a gap in the middle stops sounding like English even when every phoneme is right.
+- `▸` is the only place you're allowed to breathe. `‿` means the consonant binds to the next vowel — `pick‿up` is *"pi-kap"*.
+
+And one rule that matters more than the marks: **if you trip, repeat the group, not the sentence.** A group is three words. Restarting the sentence is what turns a stumble into a spiral.
+
+Three formats:
+
+| Command | What you get |
+|---|---|
+| `/takeclass chunked` | Inline, in the terminal. Nothing to install. |
+| `/takeclass chunked-html` | Full color, opens in your browser, scrolls while you record. |
+| `/takeclass chunked-pdf` | Printable, for a stand or a tablet. Needs `weasyprint`. |
+
+The HTML and PDF versions add a table of every fixed block in the script — with a rough respelling in your own language instead of IPA, because *"pi-kap"* is readable on sight and /pɪk ʌp/ needs a lookup — plus a 90-second warm-up drill.
+
+Pick the same format twice and it stops asking.
+
+---
+
 ## Install
 
 Requires [Claude Code](https://claude.com/claude-code).
@@ -146,10 +179,11 @@ See [ROADMAP.md](./ROADMAP.md) for the detailed specs. In short:
 
 - **v0.2 — Mirror mode.** Invert the flow: you narrate first, Claude returns a polished version with a diff of what changed and why. Active learning, not passive reading.
 - **v0.3 — Streak + weekly recap.** Daily streak counter on every class, plus a separate `/takeclass-recap` command that summarizes the week — sessions, vocabulary learned, top weak points, next week's focus.
-- **v0.4 — Voice loop.** Read the script aloud, Claude hears you, flags pronunciation and filler words. Bring your own STT (OS dictation, Whisper, etc.).
-- **v0.5 — MCP server.** Decouple the logic so any MCP client can host the class, not just Claude Code.
-- **v0.6 — Progression engine.** Spaced-repetition for weak words, automatic difficulty curve, vocabulary deck.
-- **v0.7+** — interview-practice mode, team mode, Linear/Jira integration, persona mode.
+- **v0.4 — Chunked reading.** The script marked up with breath groups, stress, phrasal-verb blocks, linking and pauses. Inline, HTML or PDF.
+- **v0.5 — Voice loop.** Read the script aloud, Claude hears you, flags pronunciation and filler words. Bring your own STT (OS dictation, Whisper, etc.).
+- **v0.6 — MCP server.** Decouple the logic so any MCP client can host the class, not just Claude Code.
+- **v0.7 — Progression engine.** Spaced-repetition for weak words, automatic difficulty curve, vocabulary deck.
+- **v0.8+** — interview-practice mode, team mode, Linear/Jira integration, persona mode.
 
 ---
 

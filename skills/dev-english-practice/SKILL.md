@@ -1,7 +1,7 @@
 ---
 name: dev-english-practice
-description: English practice for developers built around their daily git diff. Three modes — default (read-aloud class with vocabulary, script, rephrase drills, self-check), mirror (user narrates first, Claude polishes with a diff), and recap (rolling 7-day summary). Triggers on /takeclass, /takeclass mirror, /takeclass-recap, or natural-language requests like "practice English on today's work", "correct my English", "how did I do this week".
-version: 0.3.0
+description: English practice for developers built around their daily git diff. Three modes — default (read-aloud class with vocabulary, script, rephrase drills, self-check), mirror (user narrates first, Claude polishes with a diff), and recap (rolling 7-day summary). The read-aloud script can be rendered with chunking marks (breath groups, stress, phrasal-verb blocks, linking, pauses) inline, as HTML, or as PDF. Triggers on /takeclass, /takeclass mirror, /takeclass chunked, /takeclass-recap, or natural-language requests like "practice English on today's work", "correct my English", "how did I do this week".
+version: 0.4.0
 license: MIT
 ---
 
@@ -35,7 +35,7 @@ When args conflict (e.g. `/takeclass mirror advanced`), mirror mode wins for flo
 
 ## Inputs
 
-- **Optional args from `/takeclass`**: any of `$1`, `$2`, `$3` may be `beginner|intermediate|advanced` (level), `standup|pr-description|tech-talk|casual-explain` (style), or `mirror` (mode flag). Order is flexible.
+- **Optional args from `/takeclass`**: any of `$1`, `$2`, `$3` may be `beginner|intermediate|advanced` (level), `standup|pr-description|tech-talk|casual-explain` (style), `mirror` (mode flag), or `chunked|chunked-html|chunked-pdf` (chunking flag — see [Phase 5](#phase-5--offer-the-chunked-version)). Order is flexible.
 - **`/takeclass-recap`**: takes no args.
 - **Current working directory**: used to gather git activity in default and mirror modes. Ignored in recap mode.
 - **Memory**: prior level, style, weak points, session log, past warm-up vocabulary, past recaps.
@@ -94,8 +94,12 @@ type: user
 
 - Level: intermediate
 - Style: standup
+- Chunking: cli
 - Last updated: 2026-04-17
 ```
+
+`Chunking` is optional and only appears once the user has settled on a format
+(see [Phase 5](#phase-5--offer-the-chunked-version)). Absent means "keep asking".
 
 If args were passed (`/takeclass advanced tech-talk`), use them and skip the questions. Still save/update memory with the new values.
 
@@ -203,6 +207,66 @@ Then the four sections. End with:
 ```
 💡 When you finish reading aloud, tell me which words tripped you up — I'll log them for next time.
 ```
+
+## Phase 5 — Offer the chunked version
+
+*Applies to **default** mode only. Skip in mirror and recap modes.*
+
+A plain paragraph tells the reader nothing about where to breathe, what to stress, or
+which words never come apart. Chunking marks all three on the page. Read
+[references/chunking.md](references/chunking.md) before producing any chunked output —
+it defines the five marks, the sizing rules, and the three formats.
+
+### When to offer it
+
+After emitting the class, add one line:
+
+```
+📄 Want this script with chunking marks — breath groups, stress, phrasal-verb blocks? (cli / html / pdf / no)
+```
+
+Do **not** use `AskUserQuestion` here. It is a one-line aside at the end of a long
+output, not a decision that should interrupt the flow with a modal.
+
+Skip the question entirely when:
+
+- The user passed `chunked`, `chunked-html` or `chunked-pdf` as an arg → produce that
+  format immediately, no question.
+- Memory records a standing preference (see below) → honor it silently, and mention in
+  one short line which format you used and that they can change it any time.
+
+### Formats
+
+| Arg | Format | Needs |
+|---|---|---|
+| `chunked` | `cli` — inline, markdown marks | nothing |
+| `chunked-html` | `html` — full color, opens in browser | nothing |
+| `chunked-pdf` | `pdf` — printable | `weasyprint` |
+
+Before offering `pdf`, check `command -v weasyprint`. If it is absent, drop `pdf` from
+the offered choices and add one line: *"`pip install weasyprint` unlocks a PDF version."*
+Never attempt to install it, and never let its absence block the class.
+
+For `html` and `pdf`, write the file under the system temp dir (or a path the user
+names), inline `assets/chunking.css` inside a `<style>` tag so the file is
+self-contained, and open it with whichever of `wslview` / `xdg-open` / `open` exists.
+If none exist, print the absolute path.
+
+### What gets chunked
+
+Only **section 2, the script to read aloud**. Vocabulary, drills and self-check
+questions stay plain — they are reference, not performance.
+
+`html` and `pdf` carry the whole class so the file stands alone, and add two things
+`cli` omits: the fixed-block table (block / sounds like / what it is) and the
+90-second drill. Inline, those push the script off screen.
+
+### Memory
+
+If the user picks the same format **twice in a row**, save it to
+`english_preferences.md` as `Chunking: {format}` and stop asking. Tell them once that
+you have done so and that they can change it any time. If they ever answer `no`, drop
+the standing preference and go back to asking.
 
 ## Mirror mode flow
 

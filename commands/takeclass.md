@@ -1,6 +1,6 @@
 ---
 description: Start an English practice session based on today's dev work
-argument-hint: "[level] [style] | mirror"
+argument-hint: "[level] [style] | mirror | chunked[-html|-pdf]"
 ---
 
 Invoke the `dev-english-practice` skill via the Skill tool.
@@ -18,13 +18,18 @@ Any of `$1`, `$2`, `$3` may be one of:
 - `beginner` / `intermediate` / `advanced` → level.
 - `standup` / `pr-description` / `tech-talk` / `casual-explain` → style.
 - `mirror` → activate mirror mode.
+- `chunked` / `chunked-html` / `chunked-pdf` → emit the read-aloud script with chunking marks in that format, skipping the end-of-class question.
 
 Order is flexible. Examples:
 
 - `/takeclass` → default mode, load prefs from memory, ask if missing.
 - `/takeclass advanced tech-talk` → default mode with those overrides.
+- `/takeclass chunked` → default mode, script marked up inline.
+- `/takeclass chunked-pdf standup` → default mode, standup register, class rendered to PDF.
 - `/takeclass mirror` → mirror mode, prefs from memory.
 - `/takeclass mirror intermediate pr-description` → mirror mode with those ceilings.
+
+`mirror` and `chunked*` are mutually exclusive: chunking marks a script the user reads, and mirror has no such script. If both are present, mirror wins — say so in one line rather than silently dropping the flag.
 
 If an arg is present but doesn't match any of the categories above, stop and tell the user what the valid options are — do **not** guess.
 

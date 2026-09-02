@@ -102,7 +102,93 @@ A separate slash command so reflection is always user-initiated, never auto-fire
 
 ---
 
-## v0.4 — voice loop
+## v0.4 — chunked reading
+
+**Goal.** Mark the read-aloud script so the user knows where to breathe, what to
+stress, and which words never come apart.
+
+**Rationale.** v0.1–v0.3 give the user *what* to say. None of them say *how*. A
+learner handed a plain paragraph makes three predictable mistakes, and not one of
+them is grammar: they pause wherever they run out of air (which lands mid-phrase),
+they stress every word equally (the loudest tell of a Romance-language speaker),
+and they split fixed blocks like `pick up` down the middle. All three are fixable
+on the page, before the mouth is involved.
+
+This also lands **before** the voice loop on purpose. Chunking is what makes the
+voice loop measurable: once the script declares where the pauses belong, a
+transcript can be checked against them. Ship the marks first, score against them
+later.
+
+### Marks
+
+Five, defined once in `references/chunking.md` and rendered per format:
+
+- **Breath group** — two alternating shades, said in one push of air. The shades
+  carry no meaning; they alternate so the eye can see the boundary.
+- **Fixed block** — orange. Phrasal verb or collocation, memorized as one word.
+- **Bold** — the stressed syllable. Exactly one per group, never two.
+- `‿` — linking. Final consonant binds to the next vowel.
+- `▸` — the only sanctioned pause.
+
+Anchors run 6–12 words. Longer and the learner runs out of air, loses the thread,
+and restarts the sentence — the exact failure chunking exists to prevent.
+
+### Formats
+
+| Arg | Format | Dependency |
+|---|---|---|
+| `chunked` | inline markdown (`│`, backticks, bold) | none |
+| `chunked-html` | full color, opens in browser | none |
+| `chunked-pdf` | printable | `weasyprint` |
+
+`cli` is the default because most of the time the user wants to read and move on.
+`weasyprint` is optional and frequently absent: check for it, and if it is missing,
+drop `pdf` from the offer with a one-line hint. A missing optional dependency must
+never block a class.
+
+### Scope notes
+
+- Only **section 2** gets chunked. Vocabulary, drills and self-check questions are
+  reference and prompts, not performance — marking them adds noise and teaches
+  nothing.
+- `html`/`pdf` carry the whole class so the file stands alone, and add a fixed-block
+  table plus a 90-second drill. `cli` omits both; inline they push the script off
+  screen.
+- The fixed-block table uses **respelling in the user's own language**, not IPA. A
+  Spanish speaker reads *"pi-kap"* on sight and needs a lookup table for /pɪk ʌp/.
+  The goal is a mouth that moves, not phonetic literacy.
+- Ask once at the end of the class, as a one-line aside. Not `AskUserQuestion` — a
+  modal at the end of a long output is friction, not a decision.
+
+### Files to add
+
+- `skills/dev-english-practice/references/chunking.md` — the mark spec and the three
+  format renderings.
+- `skills/dev-english-practice/assets/chunking.css` — the stylesheet for html/pdf.
+- `skills/dev-english-practice/SKILL.md` — a `Phase 5` section; existing phases
+  unchanged.
+- `commands/takeclass.md` — recognize `chunked`, `chunked-html`, `chunked-pdf`.
+
+### Font note
+
+The stylesheet asks for `"Lato", "DejaVu Sans"` in that order, and the fallback is
+load-bearing rather than decorative: Lato is the reading face, but it has no glyph
+for U+203F (`‿`). DejaVu does. Renderers fall back per character, so prose gets Lato
+and the tie marks get DejaVu. Remove DejaVu from the stack and every linking mark
+turns into a box — silently, since nothing errors.
+
+### Open questions
+
+- Should `cli` attempt real ANSI background colors instead of markdown marks? It
+  would reproduce the three-color system exactly, but whether raw escape sequences
+  survive the host's markdown renderer is host-specific and unverified. Markdown
+  marks work everywhere; treat ANSI as an experiment to confirm before shipping.
+- Is one anchor per line right for `cli`, or should short anchors share a line?
+  Currently one per line, matching how the HTML reads.
+
+---
+
+## v0.5 — voice loop
 
 **Goal.** The user reads the script aloud, Claude hears it, flags pronunciation and fluency issues.
 
@@ -120,7 +206,7 @@ A separate slash command so reflection is always user-initiated, never auto-fire
 
 ---
 
-## v0.5 — MCP server
+## v0.6 — MCP server
 
 **Goal.** Decouple the logic from Claude Code so any MCP client can host the class.
 
@@ -144,7 +230,7 @@ mcp/
 
 ---
 
-## v0.6 — progression engine
+## v0.7 — progression engine
 
 - Per-user difficulty curve: automatically bump level if the user reports zero trip-ups for N sessions in a row.
 - Spaced-repetition style reuse: weak words resurface on day 1, 3, 7, 14.
@@ -152,7 +238,7 @@ mcp/
 
 ---
 
-## v0.7+ — ideas
+## v0.8+ — ideas
 
 - `interview-practice` style (behavioral + system-design prompts built from the codebase).
 - `pair-reading`: Claude reads alternating sentences with the user.
