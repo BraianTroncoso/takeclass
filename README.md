@@ -35,11 +35,17 @@ Three open prompts you answer out loud. No grading, no autocorrect. Just you tal
 
 Your level, style, and recurring weak points are remembered across sessions. Every 5 classes, the difficulty nudges up.
 
+And optionally, the script comes **marked up for your mouth** — see below.
+
 ---
 
 ## Chunking — the script, marked up for your mouth
 
-A plain paragraph tells you nothing about *how* to say it. So at the end of each class, `takeclass` offers you the same script with reading marks on it:
+Here's the thing nobody tells you: when you read English out loud and it comes out wrong, it's usually **not your grammar**. Your grammar is fine. Three other things give you away.
+
+You pause wherever you run out of air, which lands mid-phrase. You stress every word equally, which is the single loudest tell of a Spanish, Italian or Portuguese speaker. And you split phrasal verbs down the middle, so `pick up` stops sounding like English even when every sound in it is correct.
+
+A plain paragraph tells you nothing about any of that. So the script can come like this instead:
 
 <pre>
 🟦 `YESterday I spent` 🟩 `the WHOLE day` 🟦 `on the HEro` 🟩 `of our LANDing page.` ▸
@@ -47,30 +53,54 @@ A plain paragraph tells you nothing about *how* to say it. So at the end of each
 🟦 `The HEADline is built` 🟩 `out of TIny leaves` 🟧 `come together` 🟩 `into‿a WORD.`
 </pre>
 
-Four signals, and none of them are grammar:
+Five marks, and not one of them is grammar:
 
-- 🟦 and 🟩 alternate to mark **breath groups** — say each one without stopping inside it. The two colors mean nothing individually; they alternate so your eye can see where one ends. Where you pause is most of what makes English sound fluent or broken.
-- **UPPERCASE** marks the **stressed syllable**, exactly one per group. Even stress is the loudest tell of a Spanish, Italian or Portuguese speaker — louder than any conjugation error. (Caps rather than bold, because stress lands on a syllable and `**Yes**terday` is not something a terminal renders.)
-- 🟧 marks a **fixed block**: phrasal verbs and collocations that behave like a single word. `pick up` said with a gap in the middle stops sounding like English even when every phoneme is right.
-- `▸` is the only place you're allowed to breathe. `‿` means the consonant binds to the next vowel — `pick‿up` is *"pi-kap"*.
+| Mark | Means | The rule |
+|---|---|---|
+| 🟦 🟩 | **Breath group** | Say it in one push of air. Never stop inside one. The two colors alternate so your eye sees the seam; individually they mean nothing. |
+| 🟧 | **Fixed block** | A phrasal verb or collocation. Say it as one word. If a gap creeps into the middle, you haven't learned it yet. |
+| `UPPERCASE` | **The stress** | Exactly one per group. Everything else deflates. |
+| `‿` | **Linking** | The consonant binds to the next vowel. `pick‿up` is *"pi-kap"*, not two words. |
+| `▸` | **Pause** | The only place you're allowed to breathe. |
 
-Each group is wrapped in backticks, which is what puts the text itself in color with a tinted background — so a group reads as one block instead of a run of words, and the square in front says which kind of block it is.
+And one rule that matters more than all five: **if you trip, repeat the group, not the sentence.** A group is three words. Restarting the sentence is what turns a stumble into a spiral.
 
-The squares use the same color code as the HTML and PDF versions, so you learn the system once. They're colored glyphs rather than terminal color on purpose: ANSI escape sequences get sanitized before they reach your terminal, but an emoji carries its color in the font and renders anywhere.
-
-And one rule that matters more than the marks: **if you trip, repeat the group, not the sentence.** A group is three words. Restarting the sentence is what turns a stumble into a spiral.
-
-Three formats:
+### Three formats
 
 | Command | What you get |
 |---|---|
 | `/takeclass chunked` | Inline, in the terminal. Nothing to install. |
 | `/takeclass chunked-html` | Full color, opens in your browser, scrolls while you record. |
-| `/takeclass chunked-pdf` | Printable, for a stand or a tablet. Needs `weasyprint`. |
+| `/takeclass chunked-pdf` | Printable, for a music stand or a tablet. Needs `weasyprint`. |
 
-The HTML and PDF versions add a table of every fixed block in the script — with a rough respelling in your own language instead of IPA, because *"pi-kap"* is readable on sight and /pɪk ʌp/ needs a lookup — plus a 90-second warm-up drill.
+HTML and PDF add two things the terminal can't fit: a table of every fixed block in the script, and a 90-second drill to run before you read.
 
-**You're asked once.** The first run picks your chunking format alongside your level and style, and then never asks again. The default is `none` — a plain class — because chunking is for the days you actually intend to read out loud, and marks on a script you're only skimming are noise. Change it whenever by saying so: *"switch chunking to html"*. The `chunked*` args above are one-offs and don't touch the saved setting.
+The table respells each block in **your own language** rather than IPA. A Spanish speaker reads *"pi-kap"* correctly on sight and needs a lookup table for /pɪk ʌp/. The goal is a mouth that moves, not phonetic literacy.
+
+### You're asked once
+
+The first run picks your format alongside your level and style, and never asks again. The default is `none`, a plain class, because chunking is for the days you actually intend to read out loud and marks on a script you're skimming are just noise.
+
+Change it whenever by saying so: *"switch chunking to html"*. The `chunked*` args are one-offs and don't touch the saved setting, so trying a format costs nothing.
+
+<details>
+<summary><b>Why colored squares instead of real terminal color</b></summary>
+
+<br>
+
+Because real terminal color isn't available here, and that took two experiments to establish rather than assume.
+
+**ANSI escape sequences get sanitized** by Claude Code, in both bash output and model output. They arrive as literal `[46;30m` bracket noise. It's a known upstream limitation with open issues ([#18728](https://github.com/anthropics/claude-code/issues/18728), [#16668](https://github.com/anthropics/claude-code/issues/16668)) — a `terminal.preserveAnsiCodes` setting has been requested and not shipped.
+
+**A fenced `diff` block** does get syntax highlighted, but it gives text color rather than backgrounds, offers only two usable colors and no third one for fixed blocks, and kills markdown inside the fence.
+
+Colored emoji sidestep the whole problem, because they're **glyphs**: the color lives in the font. Any terminal, any theme, and they survive being pasted into a note. Each group is also wrapped in backticks, which is the one inline construct the renderer tints, so the words themselves get color and a background and a group reads as a block instead of a run of words.
+
+One more thing this fixes, learned by shipping it broken: stress is marked with capitals rather than bold because it lands on a **syllable**, and `**Yes**terday` is not something a terminal renders. Worse, the unclosed `**` desyncs the parser for the rest of the line, so well-formed bold further along breaks too.
+
+If `preserveAnsiCodes` ever lands, real backgrounds become possible and this is worth revisiting. Until then, squares.
+
+</details>
 
 ---
 
@@ -118,6 +148,9 @@ Skip the setup from the start with args:
 
 Valid levels: `beginner` · `intermediate` · `advanced`
 Valid styles: `standup` · `pr-description` · `tech-talk` · `casual-explain`
+Valid chunking: `chunked` · `chunked-html` · `chunked-pdf`
+
+Order is flexible, so `/takeclass chunked-pdf standup` works. Chunking args are one-offs; they don't change your saved setting.
 
 You can also trigger it in plain language:
 
@@ -164,6 +197,18 @@ buffer value before we ship.
 💡 When you finish reading aloud, tell me which words tripped you up — I'll log
 them for next time.
 ```
+
+And the same script with `chunked` turned on:
+
+<pre>
+🟦 `YESterday I worked on` 🟩 `the reFACtor` 🟦 `of the auth MIDdleware.` ▸
+
+🟦 `The GOAL was` 🟧 `to support` 🟩 `reFRESH tokens` 🟦 `without BREAKing` 🟩 `exISTing flows.` ▸
+
+🟦 `Along the WAY` 🟧 `I caught` 🟩 `an EDGE case:` ▸ 🟦 `the token was vaLID` 🟩 `but exPIRED` 🟧 `by less than a second.`
+</pre>
+
+Same words. The difference is that now you know where to breathe.
 
 ---
 
