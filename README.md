@@ -42,17 +42,19 @@ Your level, style, and recurring weak points are remembered across sessions. Eve
 A plain paragraph tells you nothing about *how* to say it. So at the end of each class, `takeclass` offers you the same script with reading marks on it:
 
 ```
-YESterday I spent │ the WHOLE day │ on the HEro │ of our LANDing page. ▸
+🟦 YESterday I spent 🟩 the WHOLE day 🟦 on the HEro 🟩 of our LANDing page. ▸
 
-The HEADline is built │ out of TIny leaves │ that `come together` │ into‿a WORD.
+🟦 The HEADline is built 🟩 out of TIny leaves 🟧 come together 🟩 into‿a WORD.
 ```
 
 Four signals, and none of them are grammar:
 
-- `│` separates **breath groups** — say each one without stopping inside it. Where you pause is most of what makes English sound fluent or broken.
-- **UPPERCASE** marks the **stressed syllable**, exactly one per group. Even stress is the loudest tell of a Spanish, Italian or Portuguese speaker — louder than any conjugation error. (Caps rather than bold because stress lands on a syllable, and `**Yes**terday` is not something a terminal renders.)
-- `` `backticks` `` are **fixed blocks**: phrasal verbs and collocations that behave like a single word. `pick up` said with a gap in the middle stops sounding like English even when every phoneme is right.
+- 🟦 and 🟩 alternate to mark **breath groups** — say each one without stopping inside it. The two colors mean nothing individually; they alternate so your eye can see where one ends. Where you pause is most of what makes English sound fluent or broken.
+- **UPPERCASE** marks the **stressed syllable**, exactly one per group. Even stress is the loudest tell of a Spanish, Italian or Portuguese speaker — louder than any conjugation error. (Caps rather than bold, because stress lands on a syllable and `**Yes**terday` is not something a terminal renders.)
+- 🟧 marks a **fixed block**: phrasal verbs and collocations that behave like a single word. `pick up` said with a gap in the middle stops sounding like English even when every phoneme is right.
 - `▸` is the only place you're allowed to breathe. `‿` means the consonant binds to the next vowel — `pick‿up` is *"pi-kap"*.
+
+The squares are the same color code as the HTML and PDF versions, so you only learn the system once. They're colored glyphs rather than terminal color on purpose: ANSI escape sequences get sanitized before they reach your terminal, but an emoji carries its color in the font and renders anywhere.
 
 And one rule that matters more than the marks: **if you trip, repeat the group, not the sentence.** A group is three words. Restarting the sentence is what turns a stumble into a spiral.
 

@@ -65,21 +65,43 @@ that renders correctly in every terminal:
 
 | Mark | Rendered as |
 |---|---|
-| Breath group boundary | ` │ ` (U+2502, spaces on both sides) |
-| Fixed block | `` `backticks` `` |
-| Stress | **UPPERCASE on the stressed syllable** |
+| Breath group | 🟦 / 🟩 prefix, strictly alternating |
+| Fixed block | 🟧 prefix |
+| Stress | UPPERCASE on the stressed syllable |
 | Linking | `‿` unchanged |
 | Pause | `▸` unchanged |
 
 One anchor per line. Blank line between anchors.
 
 ```
-YESterday I spent │ the WHOLE day │ on the HEro │ of our LANDing page. ▸
+🟦 YESterday I spent 🟩 the WHOLE day 🟦 on the HEro 🟩 of our LANDing page. ▸
 
-The HEADline is built │ out of TIny leaves │ that `come together` │ into‿a WORD.
+🟦 The HEADline is built 🟩 out of TIny leaves 🟧 come together 🟩 into‿a WORD.
 
-I would `take it at face value` ▸ but aNOTHer agent │ `tries to tear it‿apart`.
+🟦 I would 🟧 take it at face value 🟦 but aNOTHer agent 🟧 tries to tear it‿apart.
 ```
+
+The squares carry the same color code as the HTML and PDF versions — blue and green
+alternate for breath groups and mean nothing individually, orange marks a fixed
+block. A reader who has seen the PDF reads this without being taught twice.
+
+### Why colored squares and not real color
+
+Colored emoji are glyphs. They carry their color in the font, so they render in any
+terminal, in any theme, and survive being pasted anywhere.
+
+Real terminal color is not available here and this is not worth re-testing:
+
+- **ANSI escapes are sanitized** by the host, in both bash output and model output.
+  They arrive as literal `[46;30m` bracket noise. This is a known limitation with
+  open upstream issues (`terminal.preserveAnsiCodes` has been requested, not shipped).
+- **A fenced ```diff block** does get highlighted, but it gives text color rather than
+  background, offers only two usable colors and no third for fixed blocks, and kills
+  markdown inside the fence.
+
+Do not put fixed blocks in backticks *and* mark them with 🟧. The renderer tints
+inline code, and that tint fights the orange square instead of reinforcing it. Pick
+the square.
 
 ### Never use `**bold**` for stress in `cli`
 

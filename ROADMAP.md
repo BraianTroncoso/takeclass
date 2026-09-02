@@ -137,7 +137,7 @@ and restarts the sentence — the exact failure chunking exists to prevent.
 
 | Arg | Format | Dependency |
 |---|---|---|
-| `chunked` | inline markdown (`│`, backticks, UPPERCASE stress) | none |
+| `chunked` | inline (🟦🟩🟧 squares, UPPERCASE stress) | none |
 | `chunked-html` | full color, opens in browser | none |
 | `chunked-pdf` | printable | `weasyprint` |
 
@@ -211,8 +211,20 @@ either case — see the bold rule in `references/chunking.md` — so it is not a
 differentiator. Red also reads as *error*, when here it would only mean *next group*.
 Not worth the trade.
 
-Both experiments point the same way: inline output should lean on what the markdown
-renderer already colors, not on trying to drive the terminal directly.
+### Settled: colored squares are the answer
+
+Both dead ends point the same way — stop trying to drive the terminal, and use
+something that carries its own color. Colored emoji (🟦 🟩 🟧) are glyphs: the color
+lives in the font, so it renders in any terminal, in any theme, and survives a
+copy-paste into a note.
+
+They also map one-to-one onto the palette already used in the HTML and PDF, so a
+reader who has seen either one does not learn a second system.
+
+The host sanitizing ANSI is a known upstream limitation, not a local misconfiguration
+— `terminal.preserveAnsiCodes` has been requested and not shipped. If it ever lands,
+real backgrounds become possible and this decision is worth revisiting. Until then,
+squares.
 
 ### Open questions
 
